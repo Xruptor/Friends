@@ -3,7 +3,7 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../Interface.xsd">
     <Windows>
 	
-        <Window name="FriendsKilledBy" inherits="EA_Window_Default" handleinput="false" movable="true" savesettings="true" layer="popup" >
+        <Window name="KillAlertKilledBy" inherits="EA_Window_Default" handleinput="false" movable="true" savesettings="true" layer="popup" >
 		
             <Size>
                 <AbsPoint x="750" y="30" />
@@ -39,7 +39,7 @@
         </Window>
 		
 		<!-- Added by Xruptor -->
-        <Window name="FriendsKilledByMe" inherits="EA_Window_Default" handleinput="false" movable="true" savesettings="true" layer="popup" >
+        <Window name="KillAlertKilledByMe" inherits="EA_Window_Default" handleinput="false" movable="true" savesettings="true" layer="popup" >
 		
             <Size>
                 <AbsPoint x="750" y="60" />

@@ -1,4 +1,6 @@
-Friends = Friends or {};
+KillAlert = KillAlert or {};
+--NOTE this addon is a heavily inspired and modified version of Caffeine's Friends addon from VinyUI.
+--I have renamed it to KillAlert as I felt that Friends didn't really capture the overall essence of the addon and made it confusing in regards to the social aspect of friends.
 
 local pairs = pairs
 local ipairs = ipairs
@@ -30,13 +32,13 @@ local SHOW_LOCATION = false
 local SHOW_ABILITY_ICONS = true  --this causes a bit of stutter after each kill
 local timeUntillFadeOutKilledByMe;
 
-Friends.groupMembers = {};
+KillAlert.groupMembers = {};
 
 ----Added by Xruptor
-Friends.sessionUnknownList = {};
-Friends.combatListIndex = 0;
-Friends.combatListOrder = {};
-Friends.combatListAbilityName = {};
+KillAlert.sessionUnknownList = {};
+KillAlert.combatListIndex = 0;
+KillAlert.combatListOrder = {};
+KillAlert.combatListAbilityName = {};
 
 local function FixString(str)
 	if (str == nil) then return nil end	
@@ -71,22 +73,22 @@ local function GetIconByAbilityName(abilityName)
 	abilityName = towstring(abilityName):lower()
 
 	--first check to see if we grabbed it already from combatlog parser
-	if Friends.combatListAbilityName and Friends.combatListAbilityName[abilityName] then
+	if KillAlert.combatListAbilityName and KillAlert.combatListAbilityName[abilityName] then
 		--update it if it's stored and doesn't match
-		if Friends.IconList[abilityName] and Friends.IconList[abilityName] ~= Friends.combatListAbilityName[abilityName] then
-			Friends.IconList[abilityName] = Friends.combatListAbilityName[abilityName]
+		if KillAlert.IconList[abilityName] and KillAlert.IconList[abilityName] ~= KillAlert.combatListAbilityName[abilityName] then
+			KillAlert.IconList[abilityName] = KillAlert.combatListAbilityName[abilityName]
 		end
 		--d("we got it from combat parser")
-		return Friends.combatListAbilityName[abilityName]
+		return KillAlert.combatListAbilityName[abilityName]
 	end
 	
 	--second check to see if we already have it stored, that way we don't have to go through the loop
-	if Friends.IconList and Friends.IconList[abilityName] then
-		local storedIcon = Friends.IconList[abilityName];
+	if KillAlert.IconList and KillAlert.IconList[abilityName] then
+		local storedIcon = KillAlert.IconList[abilityName];
 		
 		if storedIcon and storedIcon ~= "icon000000" and storedIcon ~= "icon-00001" and storedIcon ~= "icon-00002" then
 			--d("we got it stored")
-			return Friends.IconList[abilityName];
+			return KillAlert.IconList[abilityName];
 		else
 			--somehow it was stored incorrectly, either way don't show it
 			return nil
@@ -94,7 +96,7 @@ local function GetIconByAbilityName(abilityName)
 	end
 	
 	--lastly, check the current session list and see if it was already parsed
-	if Friends.sessionUnknownList and Friends.sessionUnknownList[abilityName] then
+	if KillAlert.sessionUnknownList and KillAlert.sessionUnknownList[abilityName] then
 		--d("we got it from session list")
 		--it's already been parsed so if we didn't have an icon for it then it's "icon000000"
 		return nil
@@ -121,55 +123,55 @@ local function GetIconByAbilityName(abilityName)
 	if (abilityName == rangedSlot or abilityName == towstring(rangedSlot) or origAbilityName == rangedSlot or towstring(origAbilityName) == towstring(rangedSlot)) then return nil end
 	
 	--it's probably a weapon attack or something I completely missed, or a buff that triggers or something lets just store it, to avoid going through loop again
-	if Friends.sessionUnknownList then
-		Friends.sessionUnknownList[abilityName] = "icon000000"
+	if KillAlert.sessionUnknownList then
+		KillAlert.sessionUnknownList[abilityName] = "icon000000"
 		--store it for future processing
-		Friends.IconList.UnknownAbilityID[abilityName] = "icon000000"
+		KillAlert.IconList.UnknownAbilityID[abilityName] = "icon000000"
 	end
 
 	return nil
 end
 
-function Friends.init()
+function KillAlert.init()
 
-	localization = Friends.Localization.GetMapping();
+	localization = KillAlert.Localization.GetMapping();
 	SelfName = FixString(GameData.Player.name);
 	
 	--Added by Xruptor
-	if not Friends.IconList then Friends.IconList = {}; end
-	if not Friends.IconList.UnknownAbilityID then Friends.IconList.UnknownAbilityID = {}; end
+	if not KillAlert.IconList then KillAlert.IconList = {}; end
+	if not KillAlert.IconList.UnknownAbilityID then KillAlert.IconList.UnknownAbilityID = {}; end
 	
 	--Added by Xruptor
 	--reset, icon list for the session
-	Friends.sessionUnknownList = {}
+	KillAlert.sessionUnknownList = {}
 	
-	CreateWindow("FriendsKilledBy", true);
-	LayoutEditor.RegisterWindow("FriendsKilledBy", L"Friends 'Killed by'", L"Friends 'killed by' window", true, true, true, nil);
-	WindowSetShowing ("FriendsKilledBy", true);
-	
-	--Added by Xruptor
-	CreateWindow("FriendsKilledByMe", true);
-	LayoutEditor.RegisterWindow("FriendsKilledByMe", L"Friends 'Killed by Me'", L"Friends 'killed by Me' window", true, true, true, nil);
-	WindowSetShowing ("FriendsKilledByMe", true);
-	
-	RegisterEventHandler(TextLogGetUpdateEventId("Combat"), "Friends.OnChatLogUpdated");
-	RegisterEventHandler(SystemData.Events.LOADING_END, "Friends.ClearAllKillWindows");
+	CreateWindow("KillAlertKilledBy", true);
+	LayoutEditor.RegisterWindow("KillAlertKilledBy", L"KillAlert 'Killed by'", L"KillAlert 'killed by' window", true, true, true, nil);
+	WindowSetShowing ("KillAlertKilledBy", true);
 	
 	--Added by Xruptor
-	RegisterEventHandler(SystemData.Events.WORLD_OBJ_COMBAT_EVENT, "Friends.OnCombatEvent")
+	CreateWindow("KillAlertKilledByMe", true);
+	LayoutEditor.RegisterWindow("KillAlertKilledByMe", L"KillAlert 'Killed by Me'", L"KillAlert 'killed by Me' window", true, true, true, nil);
+	WindowSetShowing ("KillAlertKilledByMe", true);
 	
-	--RegisterEventHandler(SystemData.Events.GROUP_UPDATED			, "Friends.GROUP_UPDATED");
-    --RegisterEventHandler(SystemData.Events.GROUP_STATUS_UPDATED		, "Friends.GROUP_UPDATED");
-	--RegisterEventHandler(SystemData.Events.GROUP_LEAVE           	, "Friends.GROUP_UPDATED");	
+	RegisterEventHandler(TextLogGetUpdateEventId("Combat"), "KillAlert.OnChatLogUpdated");
+	RegisterEventHandler(SystemData.Events.LOADING_END, "KillAlert.ClearAllKillWindows");
 	
-	Friends.GROUP_UPDATED();
+	--Added by Xruptor
+	RegisterEventHandler(SystemData.Events.WORLD_OBJ_COMBAT_EVENT, "KillAlert.OnCombatEvent")
 	
-	Friends.parseUnknownsAbilities()
+	--RegisterEventHandler(SystemData.Events.GROUP_UPDATED			, "KillAlert.GROUP_UPDATED");
+    --RegisterEventHandler(SystemData.Events.GROUP_STATUS_UPDATED		, "KillAlert.GROUP_UPDATED");
+	--RegisterEventHandler(SystemData.Events.GROUP_LEAVE           	, "KillAlert.GROUP_UPDATED");	
+	
+	KillAlert.GROUP_UPDATED();
+	
+	KillAlert.parseUnknownsAbilities()
 	
 end
 
 --Added by Xruptor
-function Friends.parseUnknownsAbilities()
+function KillAlert.parseUnknownsAbilities()
 
 	for id = 1, 100000
 	do
@@ -183,13 +185,13 @@ function Friends.parseUnknownsAbilities()
 				local firstCheck = SimpleFixString(GetAbilityName(id)):lower()
 				local secondCheck = FixString(GetAbilityName(id)):lower()
 
-				if Friends.IconList.UnknownAbilityID[firstCheck] then
-					Friends.IconList[firstCheck] = iconTexture
-					Friends.IconList.UnknownAbilityID[firstCheck] = nil
+				if KillAlert.IconList.UnknownAbilityID[firstCheck] then
+					KillAlert.IconList[firstCheck] = iconTexture
+					KillAlert.IconList.UnknownAbilityID[firstCheck] = nil
 					
-				elseif Friends.IconList.UnknownAbilityID[secondCheck] then
-					Friends.IconList[secondCheck] = iconTexture
-					Friends.IconList.UnknownAbilityID[secondCheck] = nil
+				elseif KillAlert.IconList.UnknownAbilityID[secondCheck] then
+					KillAlert.IconList[secondCheck] = iconTexture
+					KillAlert.IconList.UnknownAbilityID[secondCheck] = nil
 				
 				end
 				
@@ -202,16 +204,16 @@ function Friends.parseUnknownsAbilities()
 end
 
 --Added by Xruptor
-function Friends.OnCombatEvent(objectID, amount, combatEvent, abilityID)
+function KillAlert.OnCombatEvent(objectID, amount, combatEvent, abilityID)
 
 	local player, pet, ability, source
 
 	player = (objectID == GameData.Player.worldObjNum)
 	pet = (objectID == GameData.Player.Pet.objNum)
 	
-	if not Friends.combatListIndex then Friends.combatListIndex = 0 end
-	if not Friends.combatListOrder then Friends.combatListOrder = {} end
-	if not Friends.combatListAbilityName then Friends.combatListAbilityName = {} end
+	if not KillAlert.combatListIndex then KillAlert.combatListIndex = 0 end
+	if not KillAlert.combatListOrder then KillAlert.combatListOrder = {} end
+	if not KillAlert.combatListAbilityName then KillAlert.combatListAbilityName = {} end
 	
 	--so if we have player or pet, that's incoming damage of which we don't care about, we care about outgoing
 	if not player and not pet and abilityID and abilityID ~= 0 then
@@ -229,32 +231,32 @@ function Friends.OnCombatEvent(objectID, amount, combatEvent, abilityID)
 			--d("abilityName: "..debugAbilityName.."  icon: "..icon)
 			
 			--first check to see if it's already in the list
-			if Friends.combatListAbilityName[abilityName] then
+			if KillAlert.combatListAbilityName[abilityName] then
 				--d(debugAbilityName.." is already in list")
 				return nil
 			end
 			
 			--if it's not in the list then lets add it, start by incrementing the index
-			Friends.combatListIndex = Friends.combatListIndex + 1
+			KillAlert.combatListIndex = KillAlert.combatListIndex + 1
 			
 			--if the index is greater than 200 reset it back to 1, so we get rid of the oldest entry first
-			if Friends.combatListIndex > 200 then Friends.combatListIndex = 1 end
+			if KillAlert.combatListIndex > 200 then KillAlert.combatListIndex = 1 end
 			
 			--check to see if we already have that entry, if so remove the old entry first, we really only want to keep the last 200 or so abilities last used
 			--otherwise this list may grow too big and just consume way too much memory
-			if Friends.combatListOrder[Friends.combatListIndex] then
-				Friends.combatListAbilityName[Friends.combatListOrder[Friends.combatListIndex]] = nil --remove the ability by it's name
+			if KillAlert.combatListOrder[KillAlert.combatListIndex] then
+				KillAlert.combatListAbilityName[KillAlert.combatListOrder[KillAlert.combatListIndex]] = nil --remove the ability by it's name
 			end
 			
 			--now we can add it
-			Friends.combatListOrder[Friends.combatListIndex] = abilityName
-			Friends.combatListAbilityName[abilityName] = icon
-			--d(debugAbilityName.." ++ has been added ==> "..tostring(Friends.combatListIndex))
+			KillAlert.combatListOrder[KillAlert.combatListIndex] = abilityName
+			KillAlert.combatListAbilityName[abilityName] = icon
+			--d(debugAbilityName.." ++ has been added ==> "..tostring(KillAlert.combatListIndex))
 			
 			--check if we have it stored as unknown, if so update it so that other classes can refer to it
-			if Friends.IconList.UnknownAbilityID[abilityName] then
-				Friends.IconList[abilityName] = icon
-				Friends.IconList.UnknownAbilityID[abilityName] = nil
+			if KillAlert.IconList.UnknownAbilityID[abilityName] then
+				KillAlert.IconList[abilityName] = icon
+				KillAlert.IconList.UnknownAbilityID[abilityName] = nil
 			end
 			
 		end
@@ -263,7 +265,7 @@ function Friends.OnCombatEvent(objectID, amount, combatEvent, abilityID)
 
 end
 
-function Friends.GROUP_UPDATED()
+function KillAlert.GROUP_UPDATED()
 
 	if (GameData.Player.isInScenario == true) then return end
 
@@ -279,15 +281,15 @@ function Friends.GROUP_UPDATED()
 		end
 	end
 
-	Friends.groupMembers = groupMembers;
+	KillAlert.groupMembers = groupMembers;
 	
 end
 
-function Friends.OnUpdate(timeElapsed)
+function KillAlert.OnUpdate(timeElapsed)
 	if timeUntillFadeOut then
 		timeUntillFadeOut = timeUntillFadeOut - timeElapsed;
 		if (timeUntillFadeOut <= 0) then
-			Friends.ClearKillWindow();
+			KillAlert.ClearKillWindow();
 			timeUntillFadeOut = nil;
 		end
 	end
@@ -295,14 +297,14 @@ function Friends.OnUpdate(timeElapsed)
 	if timeUntillFadeOutKilledByMe then
 		timeUntillFadeOutKilledByMe = timeUntillFadeOutKilledByMe - timeElapsed;
 		if (timeUntillFadeOutKilledByMe <= 0) then
-			Friends.ClearKilledByMeWindow();
+			KillAlert.ClearKilledByMeWindow();
 			timeUntillFadeOutKilledByMe = nil;
 		end
 	end
 end
 
 --Updated by Xruptor
-function Friends.OnChatLogUpdated(updateType, filterType)
+function KillAlert.OnChatLogUpdated(updateType, filterType)
 
 	if (updateType ~= SystemData.TextLogUpdate.ADDED) then return end
 	if not (filterType == SystemData.ChatLogFilters.RVR_KILLS_ORDER or filterType == SystemData.ChatLogFilters.RVR_KILLS_DESTRUCTION) then 
@@ -340,9 +342,9 @@ function Friends.OnChatLogUpdated(updateType, filterType)
 
 		if (player ~= SelfName) then
 			if not SHOW_GROUP_WEAPON_KILLS then
-				Friends.AnnounceKill(killString);
+				KillAlert.AnnounceKill(killString);
 			else
-				Friends.AnnounceKill(killString .. towstring(CreateHyperLink(L"", tmpWeaponLeft .. weapon .. tmpWeaponRight, WEAPONUSED_COLOR, {} )) );
+				KillAlert.AnnounceKill(killString .. towstring(CreateHyperLink(L"", tmpWeaponLeft .. weapon .. tmpWeaponRight, WEAPONUSED_COLOR, {} )) );
 			end
 		else
 			--it was my kill
@@ -362,10 +364,10 @@ function Friends.OnChatLogUpdated(updateType, filterType)
 			end
 			
 			--do the regular announce
-			Friends.AnnounceKill(killString .. towstring(tmpIconTexIndent .. tmpIconTex .. CreateHyperLink(L"", tmpWeaponLeft .. weapon .. tmpWeaponRight, WEAPONUSED_COLOR, {} )) );
+			KillAlert.AnnounceKill(killString .. towstring(tmpIconTexIndent .. tmpIconTex .. CreateHyperLink(L"", tmpWeaponLeft .. weapon .. tmpWeaponRight, WEAPONUSED_COLOR, {} )) );
 
 			--now do the killed by me announcement
-			Friends.AnnounceMyKill(killString, towstring(tmpIconTex .. tmpIconTexIndent .. CreateHyperLink(L"", weapon, WEAPONUSED_COLOR, {} )) );
+			KillAlert.AnnounceMyKill(killString, towstring(tmpIconTex .. tmpIconTexIndent .. CreateHyperLink(L"", weapon, WEAPONUSED_COLOR, {} )) );
 			
 			--only play the sound if we don't have Deathblow installed
 			if not (Deathblow) then
@@ -410,13 +412,13 @@ function Friends.OnChatLogUpdated(updateType, filterType)
 
 		if (victim ~= SelfName) then
 			if not SHOW_GROUP_WEAPON_KILLS then
-				Friends.AnnounceKill(killString);
+				KillAlert.AnnounceKill(killString);
 			else
-				Friends.AnnounceKill(killString .. towstring(CreateHyperLink(L"", tmpWeaponLeft .. weapon .. tmpWeaponRight, WEAPONUSED_COLOR, {} )) );
+				KillAlert.AnnounceKill(killString .. towstring(CreateHyperLink(L"", tmpWeaponLeft .. weapon .. tmpWeaponRight, WEAPONUSED_COLOR, {} )) );
 			end
 		else
 			--it was my death
-			Friends.AnnounceKill(killString .. towstring(CreateHyperLink(L"", tmpWeaponLeft .. weapon .. tmpWeaponRight, WEAPONUSED_COLOR, {} )) );
+			KillAlert.AnnounceKill(killString .. towstring(CreateHyperLink(L"", tmpWeaponLeft .. weapon .. tmpWeaponRight, WEAPONUSED_COLOR, {} )) );
 		end
 		
 		if SHOW_LOCATION then
@@ -437,39 +439,39 @@ function Friends.OnChatLogUpdated(updateType, filterType)
 	
 end
 
-function Friends.AnnounceKill(killString)
-	LabelSetText ("FriendsKilledByText", killString);	
-	WindowStopAlphaAnimation ("FriendsKilledBy");
-	WindowStartAlphaAnimation ("FriendsKilledBy", Window.AnimationType.SINGLE_NO_RESET, 1, 0, 0, true, 0, 1);
-	WindowStartAlphaAnimation ("FriendsKilledBy", Window.AnimationType.SINGLE_NO_RESET, 0, 1, 0.2, true, 0, 1);
+function KillAlert.AnnounceKill(killString)
+	LabelSetText ("KillAlertKilledByText", killString);	
+	WindowStopAlphaAnimation ("KillAlertKilledBy");
+	WindowStartAlphaAnimation ("KillAlertKilledBy", Window.AnimationType.SINGLE_NO_RESET, 1, 0, 0, true, 0, 1);
+	WindowStartAlphaAnimation ("KillAlertKilledBy", Window.AnimationType.SINGLE_NO_RESET, 0, 1, 0.2, true, 0, 1);
 	timeUntillFadeOut = TIME_DELAY;
 end
 
 --Added by Xruptor
-function Friends.AnnounceMyKill(killString, weapString)
-	LabelSetText ("FriendsKilledByMeText", killString);
-	LabelSetText ("FriendsKilledByMeWeapon", weapString);	
-	WindowStopAlphaAnimation ("FriendsKilledByMe");
-	WindowStartAlphaAnimation ("FriendsKilledByMe", Window.AnimationType.SINGLE_NO_RESET, 1, 0, 0, true, 0, 1);
-	WindowStartAlphaAnimation ("FriendsKilledByMe", Window.AnimationType.SINGLE_NO_RESET, 0, 1, 0.2, true, 0, 1);
+function KillAlert.AnnounceMyKill(killString, weapString)
+	LabelSetText ("KillAlertKilledByMeText", killString);
+	LabelSetText ("KillAlertKilledByMeWeapon", weapString);	
+	WindowStopAlphaAnimation ("KillAlertKilledByMe");
+	WindowStartAlphaAnimation ("KillAlertKilledByMe", Window.AnimationType.SINGLE_NO_RESET, 1, 0, 0, true, 0, 1);
+	WindowStartAlphaAnimation ("KillAlertKilledByMe", Window.AnimationType.SINGLE_NO_RESET, 0, 1, 0.2, true, 0, 1);
 	timeUntillFadeOutKilledByMe = TIME_DELAY_KBM;
 end
 
-function Friends.ClearKillWindow()
-	WindowStopAlphaAnimation ("FriendsKilledBy")
-	WindowStartAlphaAnimation ("FriendsKilledBy", Window.AnimationType.SINGLE_NO_RESET, 1, 1, 0, true, 0, 1)
-	WindowStartAlphaAnimation ("FriendsKilledBy", Window.AnimationType.SINGLE_NO_RESET, 1, 0, 1, true, 0, 1)
+function KillAlert.ClearKillWindow()
+	WindowStopAlphaAnimation ("KillAlertKilledBy")
+	WindowStartAlphaAnimation ("KillAlertKilledBy", Window.AnimationType.SINGLE_NO_RESET, 1, 1, 0, true, 0, 1)
+	WindowStartAlphaAnimation ("KillAlertKilledBy", Window.AnimationType.SINGLE_NO_RESET, 1, 0, 1, true, 0, 1)
 end
 
 --Added by Xruptor
-function Friends.ClearKilledByMeWindow()
-	WindowStopAlphaAnimation ("FriendsKilledByMe")
-	WindowStartAlphaAnimation ("FriendsKilledByMe", Window.AnimationType.SINGLE_NO_RESET, 1, 1, 0, true, 0, 1)
-	WindowStartAlphaAnimation ("FriendsKilledByMe", Window.AnimationType.SINGLE_NO_RESET, 1, 0, 1, true, 0, 1)
+function KillAlert.ClearKilledByMeWindow()
+	WindowStopAlphaAnimation ("KillAlertKilledByMe")
+	WindowStartAlphaAnimation ("KillAlertKilledByMe", Window.AnimationType.SINGLE_NO_RESET, 1, 1, 0, true, 0, 1)
+	WindowStartAlphaAnimation ("KillAlertKilledByMe", Window.AnimationType.SINGLE_NO_RESET, 1, 0, 1, true, 0, 1)
 end
 
 --Added by Xruptor
-function Friends.ClearAllKillWindows()
-	Friends.ClearKillWindow();
-	Friends.ClearKilledByMeWindow();
+function KillAlert.ClearAllKillWindows()
+	KillAlert.ClearKillWindow();
+	KillAlert.ClearKilledByMeWindow();
 end

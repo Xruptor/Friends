@@ -1,23 +1,23 @@
-Friends = Friends or {};
+KillAlert = KillAlert or {};
 
 
 local match = match
 
-if (not Friends.Localization) then
-	Friends.Localization = {};
-	Friends.Localization.Language = {};
+if (not KillAlert.Localization) then
+	KillAlert.Localization = {};
+	KillAlert.Localization.Language = {};
 end
 
 local function ParseCombatMessage(message)
 
-	local localization = Friends.Localization.Language[SystemData.Settings.Language.ENGLISH];
+	local localization = KillAlert.Localization.Language[SystemData.Settings.Language.ENGLISH];
 	local victim, verb, player, weapon, location = message:match(localization["CombatMessageParseString"]);
 	
 	return victim, verb, player, weapon, location;
 
 end
 
-Friends.Localization.Language[SystemData.Settings.Language.ENGLISH] = 
+KillAlert.Localization.Language[SystemData.Settings.Language.ENGLISH] = 
 {
 	CombatMessageParseString = L"([%a]+) has been ([%a]+) by ([%a]+)'s ([%a%d%p  ]+) in ([^%.]+).",
 	["Core.HasSlain"] = L" has been slain by ",
@@ -351,5 +351,5 @@ Friends.Localization.Language[SystemData.Settings.Language.ENGLISH] =
 	["Setup.AdvancedContainersItem.Properties.Growth.Vertical.Down"] = L"Down",
 };
 
-Friends.Localization.Language[SystemData.Settings.Language.ENGLISH].CombatMessageParser = ParseCombatMessage;
+KillAlert.Localization.Language[SystemData.Settings.Language.ENGLISH].CombatMessageParser = ParseCombatMessage;
 
