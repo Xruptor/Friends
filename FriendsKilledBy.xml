@@ -6,7 +6,7 @@
         <Window name="FriendsKilledBy" inherits="EA_Window_Default" handleinput="false" movable="true" savesettings="true" layer="popup" >
 		
             <Size>
-                <AbsPoint x="900" y="30" />
+                <AbsPoint x="750" y="30" />
             </Size>
 			
             <Anchors>
@@ -27,7 +27,7 @@
                         <Anchor point="bottomright" relativePoint="bottomright" />
                     </Anchors>
                 </Label>
-				
+
 				<!--
 				<Label name="$parentPlayer" font="font_clear_large_bold" autoresize="true" textalign="center" layer="default"  handleinput="false"><Size><AbsPoint x="100" y="30" /></Size><Anchors><Anchor point="left" relativePoint="center" relativeTo="$parent"><AbsPoint x="0" y="0" /></Anchor></Anchors><Color r="255" g="25" b="25" a="255" /></Label>
 				<!-- static " killed " label - -><Label name="$parentKilled" font="font_clear_large_bold" autoresize="true" textalign="center" wordwrap="true"  layer="default"  handleinput="false"><Size><AbsPoint x="100" y="30" /></Size><Anchors><Anchor point="right" relativePoint="left" relativeTo="$parentPlayer"><AbsPoint x="0" y="0" /></Anchor></Anchors><Color r="255" g="255" b="255" a="255" /></Label><Label name="$parentVictim" font="font_clear_large_bold" autoresize="true" textalign="center" wordwrap="true" layer="default"  handleinput="false"><Size><AbsPoint x="100" y="30" /></Size><Anchors><Anchor point="right" relativePoint="left" relativeTo="$parentKilled"><AbsPoint x="0" y="0" /></Anchor></Anchors><Color r="0" g="205" b="255" a="255" /></Label>
@@ -35,6 +35,56 @@
 				-->
 
 				</Windows>
+				
+        </Window>
+		
+		<!-- Added by Xruptor -->
+        <Window name="FriendsKilledByMe" inherits="EA_Window_Default" handleinput="false" movable="true" savesettings="true" layer="popup" >
+		
+            <Size>
+                <AbsPoint x="750" y="60" />
+            </Size>
+			
+            <Anchors>
+                <Anchor point="center" relativePoint="center" relativeTo="Root">
+                    <AbsPoint x="0" y="-260" />
+                </Anchor>
+            </Anchors>
+			
+            <Windows>
+			
+                <Label name="$parentText" textalign="center" font="font_clear_large_bold" handleinput="false">
+                    <EventHandlers>
+                        <EventHandler event="OnHyperLinkLButtonUp" function="EA_ChatWindow.OnHyperLinkLButtonUp" />
+                        <EventHandler event="OnHyperLinkRButtonUp" function="EA_ChatWindow.OnHyperLinkRButtonUp" />
+                    </EventHandlers>
+                    <Anchors>
+                        <Anchor point="topleft" relativePoint="topleft" />
+                        <Anchor point="bottomright" relativePoint="bottomright" />
+                    </Anchors>
+                </Label>
+				
+				
+                <Label name="$parentWeapon" textalign="center" font="font_clear_large_bold" handleinput="false">
+                    <EventHandlers>
+                        <EventHandler event="OnHyperLinkLButtonUp" function="EA_ChatWindow.OnHyperLinkLButtonUp" />
+                        <EventHandler event="OnHyperLinkRButtonUp" function="EA_ChatWindow.OnHyperLinkRButtonUp" />
+                    </EventHandlers>
+					<Size><AbsPoint x="750" y="30" /></Size>
+					<Anchors>
+						<Anchor point="bottomleft" relativePoint="topleft" relativeTo="$parentText">
+							<AbsPoint x="0" y="0" />
+						</Anchor>
+					</Anchors>
+                </Label>
+				
+				<!--
+				<Label name="$parentPlayer" font="font_clear_large_bold" autoresize="true" textalign="center" layer="default"  handleinput="false"><Size><AbsPoint x="100" y="30" /></Size><Anchors><Anchor point="left" relativePoint="center" relativeTo="$parent"><AbsPoint x="0" y="0" /></Anchor></Anchors><Color r="255" g="25" b="25" a="255" /></Label>
+				<!-- static " killed " label - -><Label name="$parentKilled" font="font_clear_large_bold" autoresize="true" textalign="center" wordwrap="true"  layer="default"  handleinput="false"><Size><AbsPoint x="100" y="30" /></Size><Anchors><Anchor point="right" relativePoint="left" relativeTo="$parentPlayer"><AbsPoint x="0" y="0" /></Anchor></Anchors><Color r="255" g="255" b="255" a="255" /></Label><Label name="$parentVictim" font="font_clear_large_bold" autoresize="true" textalign="center" wordwrap="true" layer="default"  handleinput="false"><Size><AbsPoint x="100" y="30" /></Size><Anchors><Anchor point="right" relativePoint="left" relativeTo="$parentKilled"><AbsPoint x="0" y="0" /></Anchor></Anchors><Color r="0" g="205" b="255" a="255" /></Label>
+				<!-- static " in " label - -><Label name="$parentIn" font="font_clear_large_bold" autoresize="true" textalign="center" wordwrap="true"  layer="default"  handleinput="false"><Size><AbsPoint x="100" y="30" /></Size><Anchors><Anchor point="right" relativePoint="left" relativeTo="$parentVictim"><AbsPoint x="0" y="0" /></Anchor></Anchors><Color r="255" g="255" b="255" a="255" /></Label><Label name="$parentLocation" font="font_clear_large_bold" autoresize="true" textalign="center" wordwrap="true" layer="default"  handleinput="false"><Size><AbsPoint x="100" y="30" /></Size><Anchors><Anchor point="right" relativePoint="left" relativeTo="$parentIn"><AbsPoint x="0" y="0" /></Anchor></Anchors><Color r="169" g="169" b="169" a="255" /></Label> 						
+				-->
+
+			</Windows>
 				
         </Window>
 		
