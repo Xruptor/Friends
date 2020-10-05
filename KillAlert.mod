@@ -3,7 +3,7 @@
     <UiMod name="KillAlert" version="2.1" date="04/10/2020">
 	<VersionSettings gameVersion="1.4.8" windowsVersion="1.0" savedVariablesVersion="1.0" /> 
      <Author name="Caffeine" />
-        <Description text="Minimalistic addon that alerts you of your kills using ability name and icon. Also announces you when someone in your group gets a kill or dies." />
+        <Description text="Minimalistic addon that alerts you of your kills using an ability name and icon. It also announces you when someone in your group gets a kill or dies." />
 		<Dependencies>
 			<Dependency name="LibGroup" />
 		</Dependencies>

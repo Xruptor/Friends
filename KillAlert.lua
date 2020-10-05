@@ -32,8 +32,6 @@ local SHOW_LOCATION = false
 local SHOW_ABILITY_ICONS = true  --this causes a bit of stutter after each kill
 local timeUntillFadeOutKilledByMe;
 
-KillAlert.groupMembers = {};
-
 ----Added by Xruptor
 KillAlert.sessionUnknownList = {};
 KillAlert.combatListIndex = 0;
@@ -73,30 +71,19 @@ local function GetIconByAbilityName(abilityName)
 	abilityName = towstring(abilityName):lower()
 
 	--first check to see if we grabbed it already from combatlog parser
-	if KillAlert.combatListAbilityName and KillAlert.combatListAbilityName[abilityName] then
-		--update it if it's stored and doesn't match
-		if KillAlert.IconList[abilityName] and KillAlert.IconList[abilityName] ~= KillAlert.combatListAbilityName[abilityName] then
-			KillAlert.IconList[abilityName] = KillAlert.combatListAbilityName[abilityName]
-		end
+	if KillAlert.combatListAbilityName[abilityName] or KillAlert.combatListAbilityName[origAbilityName] then
 		--d("we got it from combat parser")
-		return KillAlert.combatListAbilityName[abilityName]
+		return KillAlert.combatListAbilityName[abilityName] or KillAlert.combatListAbilityName[origAbilityName];
 	end
 	
 	--second check to see if we already have it stored, that way we don't have to go through the loop
-	if KillAlert.IconList and KillAlert.IconList[abilityName] then
-		local storedIcon = KillAlert.IconList[abilityName];
-		
-		if storedIcon and storedIcon ~= "icon000000" and storedIcon ~= "icon-00001" and storedIcon ~= "icon-00002" then
-			--d("we got it stored")
-			return KillAlert.IconList[abilityName];
-		else
-			--somehow it was stored incorrectly, either way don't show it
-			return nil
-		end
+	if KillAlert.IconList[abilityName] or KillAlert.IconList[origAbilityName] then
+		--d("we got it stored")
+		return KillAlert.IconList[abilityName] or KillAlert.IconList[origAbilityName] ;
 	end
 	
 	--lastly, check the current session list and see if it was already parsed
-	if KillAlert.sessionUnknownList and KillAlert.sessionUnknownList[abilityName] then
+	if KillAlert.sessionUnknownList[abilityName] then
 		--d("we got it from session list")
 		--it's already been parsed so if we didn't have an icon for it then it's "icon000000"
 		return nil
@@ -123,11 +110,9 @@ local function GetIconByAbilityName(abilityName)
 	if (abilityName == rangedSlot or abilityName == towstring(rangedSlot) or origAbilityName == rangedSlot or towstring(origAbilityName) == towstring(rangedSlot)) then return nil end
 	
 	--it's probably a weapon attack or something I completely missed, or a buff that triggers or something lets just store it, to avoid going through loop again
-	if KillAlert.sessionUnknownList then
-		KillAlert.sessionUnknownList[abilityName] = "icon000000"
-		--store it for future processing
-		KillAlert.IconList.UnknownAbilityID[abilityName] = "icon000000"
-	end
+	KillAlert.sessionUnknownList[abilityName] = "icon000000"
+	--store it for future processing
+	KillAlert.IconList.UnknownAbilityID[abilityName] = "icon000000"
 
 	return nil
 end
@@ -159,18 +144,12 @@ function KillAlert.init()
 	
 	--Added by Xruptor
 	RegisterEventHandler(SystemData.Events.WORLD_OBJ_COMBAT_EVENT, "KillAlert.OnCombatEvent")
-	
-	--RegisterEventHandler(SystemData.Events.GROUP_UPDATED			, "KillAlert.GROUP_UPDATED");
-    --RegisterEventHandler(SystemData.Events.GROUP_STATUS_UPDATED		, "KillAlert.GROUP_UPDATED");
-	--RegisterEventHandler(SystemData.Events.GROUP_LEAVE           	, "KillAlert.GROUP_UPDATED");	
-	
-	KillAlert.GROUP_UPDATED();
-	
 	KillAlert.parseUnknownsAbilities()
 	
 end
 
 --Added by Xruptor
+--lets do a entire ability DB check for unknown abilities, we really only want to do this once during login
 function KillAlert.parseUnknownsAbilities()
 
 	for id = 1, 100000
@@ -222,12 +201,15 @@ function KillAlert.OnCombatEvent(objectID, amount, combatEvent, abilityID)
 		local abilityName = GetAbilityName(abilityID)
 		local data = GetAbilityData(abilityID)
 		local icon = GetIconData(data.iconNum)
+		
 		if icon == "icon000000" or iconTexture == "icon-00001" or iconTexture == "icon-00002"  then icon = nil end
 
 		if icon and abilityName and (abilityName):len() > 0 then
+		
 			--gotta remove that ^n from end of string
 			abilityName = SimpleFixString(abilityName):lower()
-			local debugAbilityName = tostring(abilityName) --convert from wstring to string adds a "^n" to the end of a string, if you don't do SimpleFixString
+			
+			--local debugAbilityName = tostring(abilityName) --convert from wstring to string adds a "^n" to the end of a string, if you don't do SimpleFixString
 			--d("abilityName: "..debugAbilityName.."  icon: "..icon)
 			
 			--first check to see if it's already in the list
@@ -263,26 +245,6 @@ function KillAlert.OnCombatEvent(objectID, amount, combatEvent, abilityID)
   
 	end
 
-end
-
-function KillAlert.GROUP_UPDATED()
-
-	if (GameData.Player.isInScenario == true) then return end
-
-    local partyData = PartyUtils.GetPartyData();
-	if (not partyData) then return end
-
-	local groupMembers = {};
-	groupMembers[SelfName] = true;
-	for index, partyMember in pairs (partyData) do	
-		local name = FixString(towstring(partyMember.name));
-		if name and (name ~= L"") then
-			groupMembers[name] = true;
-		end
-	end
-
-	KillAlert.groupMembers = groupMembers;
-	
 end
 
 function KillAlert.OnUpdate(timeElapsed)

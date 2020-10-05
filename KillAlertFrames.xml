@@ -28,12 +28,6 @@
                     </Anchors>
                 </Label>
 
-				<!--
-				<Label name="$parentPlayer" font="font_clear_large_bold" autoresize="true" textalign="center" layer="default"  handleinput="false"><Size><AbsPoint x="100" y="30" /></Size><Anchors><Anchor point="left" relativePoint="center" relativeTo="$parent"><AbsPoint x="0" y="0" /></Anchor></Anchors><Color r="255" g="25" b="25" a="255" /></Label>
-				<!-- static " killed " label - -><Label name="$parentKilled" font="font_clear_large_bold" autoresize="true" textalign="center" wordwrap="true"  layer="default"  handleinput="false"><Size><AbsPoint x="100" y="30" /></Size><Anchors><Anchor point="right" relativePoint="left" relativeTo="$parentPlayer"><AbsPoint x="0" y="0" /></Anchor></Anchors><Color r="255" g="255" b="255" a="255" /></Label><Label name="$parentVictim" font="font_clear_large_bold" autoresize="true" textalign="center" wordwrap="true" layer="default"  handleinput="false"><Size><AbsPoint x="100" y="30" /></Size><Anchors><Anchor point="right" relativePoint="left" relativeTo="$parentKilled"><AbsPoint x="0" y="0" /></Anchor></Anchors><Color r="0" g="205" b="255" a="255" /></Label>
-				<!-- static " in " label - -><Label name="$parentIn" font="font_clear_large_bold" autoresize="true" textalign="center" wordwrap="true"  layer="default"  handleinput="false"><Size><AbsPoint x="100" y="30" /></Size><Anchors><Anchor point="right" relativePoint="left" relativeTo="$parentVictim"><AbsPoint x="0" y="0" /></Anchor></Anchors><Color r="255" g="255" b="255" a="255" /></Label><Label name="$parentLocation" font="font_clear_large_bold" autoresize="true" textalign="center" wordwrap="true" layer="default"  handleinput="false"><Size><AbsPoint x="100" y="30" /></Size><Anchors><Anchor point="right" relativePoint="left" relativeTo="$parentIn"><AbsPoint x="0" y="0" /></Anchor></Anchors><Color r="169" g="169" b="169" a="255" /></Label> 						
-				-->
-
 				</Windows>
 				
         </Window>
@@ -78,12 +72,6 @@
 					</Anchors>
                 </Label>
 				
-				<!--
-				<Label name="$parentPlayer" font="font_clear_large_bold" autoresize="true" textalign="center" layer="default"  handleinput="false"><Size><AbsPoint x="100" y="30" /></Size><Anchors><Anchor point="left" relativePoint="center" relativeTo="$parent"><AbsPoint x="0" y="0" /></Anchor></Anchors><Color r="255" g="25" b="25" a="255" /></Label>
-				<!-- static " killed " label - -><Label name="$parentKilled" font="font_clear_large_bold" autoresize="true" textalign="center" wordwrap="true"  layer="default"  handleinput="false"><Size><AbsPoint x="100" y="30" /></Size><Anchors><Anchor point="right" relativePoint="left" relativeTo="$parentPlayer"><AbsPoint x="0" y="0" /></Anchor></Anchors><Color r="255" g="255" b="255" a="255" /></Label><Label name="$parentVictim" font="font_clear_large_bold" autoresize="true" textalign="center" wordwrap="true" layer="default"  handleinput="false"><Size><AbsPoint x="100" y="30" /></Size><Anchors><Anchor point="right" relativePoint="left" relativeTo="$parentKilled"><AbsPoint x="0" y="0" /></Anchor></Anchors><Color r="0" g="205" b="255" a="255" /></Label>
-				<!-- static " in " label - -><Label name="$parentIn" font="font_clear_large_bold" autoresize="true" textalign="center" wordwrap="true"  layer="default"  handleinput="false"><Size><AbsPoint x="100" y="30" /></Size><Anchors><Anchor point="right" relativePoint="left" relativeTo="$parentVictim"><AbsPoint x="0" y="0" /></Anchor></Anchors><Color r="255" g="255" b="255" a="255" /></Label><Label name="$parentLocation" font="font_clear_large_bold" autoresize="true" textalign="center" wordwrap="true" layer="default"  handleinput="false"><Size><AbsPoint x="100" y="30" /></Size><Anchors><Anchor point="right" relativePoint="left" relativeTo="$parentIn"><AbsPoint x="0" y="0" /></Anchor></Anchors><Color r="169" g="169" b="169" a="255" /></Label> 						
-				-->
-
 			</Windows>
 				
         </Window>
