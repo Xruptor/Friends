@@ -1,4 +1,5 @@
 KillAlert = KillAlert or {};
+--Updated by Xruptor
 --NOTE this addon is a heavily inspired and modified version of Caffeine's Friends addon from VinyUI.
 --I have renamed it to KillAlert as I felt that Friends didn't really capture the overall essence of the addon and made it confusing in regards to the social aspect of friends.
 
@@ -15,7 +16,6 @@ local CreateHyperLink = CreateHyperLink
 local ORDER_COLOR = {0,205,255};
 local DESTR_COLOR = {255,25,25};
 local LOCATION_COLOR = {169,169,169};
---Added by Xruptor
 local WEAPONUSED_COLOR = {255, 165, 0};
 
 local localization;
@@ -25,14 +25,12 @@ local SelfName;
 local TIME_DELAY = 6 -- seconds untill kill announcement fades away
 local timeUntillFadeOut;
 
---Added by Xruptor
 local TIME_DELAY_KBM = 8 -- seconds untill kill announcement fades away
 local SHOW_GROUP_WEAPON_KILLS = true
 local SHOW_LOCATION = false
 local SHOW_ABILITY_ICONS = true  --this causes a bit of stutter after each kill
 local timeUntillFadeOutKilledByMe;
 
-----Added by Xruptor
 KillAlert.sessionUnknownList = {};
 KillAlert.combatListIndex = 0;
 KillAlert.combatListOrder = {};
@@ -48,7 +46,6 @@ local function FixString(str)
 	return str;
 end
 
---Added by Xruptor
 --SimpleFixString does not remove the spaces, and does not cut off at first space found
 function SimpleFixString (str)
 	if (str == nil) then return nil end
@@ -62,7 +59,6 @@ local function IsInGroup()
 	return (GetNumGroupmates() > 0)
 end
 
---Added by Xruptor
 local function GetIconByAbilityName(abilityName)
 	if not abilityName then return nil end
 
@@ -122,11 +118,9 @@ function KillAlert.init()
 	localization = KillAlert.Localization.GetMapping();
 	SelfName = FixString(GameData.Player.name);
 	
-	--Added by Xruptor
 	if not KillAlert.IconList then KillAlert.IconList = {}; end
 	if not KillAlert.IconList.UnknownAbilityID then KillAlert.IconList.UnknownAbilityID = {}; end
 	
-	--Added by Xruptor
 	--reset, icon list for the session
 	KillAlert.sessionUnknownList = {}
 	
@@ -134,7 +128,6 @@ function KillAlert.init()
 	LayoutEditor.RegisterWindow("KillAlertKilledBy", L"KillAlert 'Killed by'", L"KillAlert 'killed by' window", true, true, true, nil);
 	WindowSetShowing ("KillAlertKilledBy", true);
 	
-	--Added by Xruptor
 	CreateWindow("KillAlertKilledByMe", true);
 	LayoutEditor.RegisterWindow("KillAlertKilledByMe", L"KillAlert 'Killed by Me'", L"KillAlert 'killed by Me' window", true, true, true, nil);
 	WindowSetShowing ("KillAlertKilledByMe", true);
@@ -142,13 +135,11 @@ function KillAlert.init()
 	RegisterEventHandler(TextLogGetUpdateEventId("Combat"), "KillAlert.OnChatLogUpdated");
 	RegisterEventHandler(SystemData.Events.LOADING_END, "KillAlert.ClearAllKillWindows");
 	
-	--Added by Xruptor
 	RegisterEventHandler(SystemData.Events.WORLD_OBJ_COMBAT_EVENT, "KillAlert.OnCombatEvent")
 	KillAlert.parseUnknownsAbilities()
 	
 end
 
---Added by Xruptor
 --lets do a entire ability DB check for unknown abilities, we really only want to do this once during login
 function KillAlert.parseUnknownsAbilities()
 
@@ -182,7 +173,6 @@ function KillAlert.parseUnknownsAbilities()
 	
 end
 
---Added by Xruptor
 function KillAlert.OnCombatEvent(objectID, amount, combatEvent, abilityID)
 
 	local player, pet, ability, source
@@ -255,7 +245,7 @@ function KillAlert.OnUpdate(timeElapsed)
 			timeUntillFadeOut = nil;
 		end
 	end
-	--Added by Xruptor
+	
 	if timeUntillFadeOutKilledByMe then
 		timeUntillFadeOutKilledByMe = timeUntillFadeOutKilledByMe - timeElapsed;
 		if (timeUntillFadeOutKilledByMe <= 0) then
@@ -265,7 +255,6 @@ function KillAlert.OnUpdate(timeElapsed)
 	end
 end
 
---Updated by Xruptor
 function KillAlert.OnChatLogUpdated(updateType, filterType)
 
 	if (updateType ~= SystemData.TextLogUpdate.ADDED) then return end
@@ -409,7 +398,6 @@ function KillAlert.AnnounceKill(killString)
 	timeUntillFadeOut = TIME_DELAY;
 end
 
---Added by Xruptor
 function KillAlert.AnnounceMyKill(killString, weapString)
 	LabelSetText ("KillAlertKilledByMeText", killString);
 	LabelSetText ("KillAlertKilledByMeWeapon", weapString);	
@@ -425,14 +413,12 @@ function KillAlert.ClearKillWindow()
 	WindowStartAlphaAnimation ("KillAlertKilledBy", Window.AnimationType.SINGLE_NO_RESET, 1, 0, 1, true, 0, 1)
 end
 
---Added by Xruptor
 function KillAlert.ClearKilledByMeWindow()
 	WindowStopAlphaAnimation ("KillAlertKilledByMe")
 	WindowStartAlphaAnimation ("KillAlertKilledByMe", Window.AnimationType.SINGLE_NO_RESET, 1, 1, 0, true, 0, 1)
 	WindowStartAlphaAnimation ("KillAlertKilledByMe", Window.AnimationType.SINGLE_NO_RESET, 1, 0, 1, true, 0, 1)
 end
 
---Added by Xruptor
 function KillAlert.ClearAllKillWindows()
 	KillAlert.ClearKillWindow();
 	KillAlert.ClearKilledByMeWindow();
