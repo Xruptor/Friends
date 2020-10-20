@@ -3,6 +3,8 @@ KillAlert = KillAlert or {};
 --NOTE this addon is a heavily inspired and modified version of Caffeine's Friends addon from VinyUI.
 --I have renamed it to KillAlert as I felt that Friends didn't really capture the overall essence of the addon and made it confusing in regards to the social aspect of friends.
 
+--NOTE: This is a fork of Friends by Caffeine.  I have spoken to Caffeine and the author has given a nod and a thumbs up to go ahead with this fork.
+
 local pairs = pairs
 local ipairs = ipairs
 local tostring = tostring
@@ -18,23 +20,23 @@ local DESTR_COLOR = {255,25,25};
 local LOCATION_COLOR = {169,169,169};
 local WEAPONUSED_COLOR = {255, 165, 0};
 
-local localization;
-
 local SelfName;
+local localization;
 
 local TIME_DELAY = 6 -- seconds untill kill announcement fades away
 local timeUntillFadeOut;
 
 local TIME_DELAY_KBM = 8 -- seconds untill kill announcement fades away
-local SHOW_GROUP_WEAPON_KILLS = true
-local SHOW_LOCATION = false
-local SHOW_ABILITY_ICONS = true  --this causes a bit of stutter after each kill
 local timeUntillFadeOutKilledByMe;
 
 KillAlert.sessionUnknownList = {};
 KillAlert.combatListIndex = 0;
 KillAlert.combatListOrder = {};
 KillAlert.combatListAbilityName = {};
+
+local function Print(str)
+    EA_ChatWindow.Print(towstring(str));
+end
 
 local function FixString(str)
 	if (str == nil) then return nil end	
@@ -114,9 +116,15 @@ local function GetIconByAbilityName(abilityName)
 end
 
 function KillAlert.init()
-
-	localization = KillAlert.Localization.GetMapping();
+	
+	localization = KillAlert.Localization.GetMapping()
+	
 	SelfName = FixString(GameData.Player.name);
+	
+	if not KillAlert.Settings then KillAlert.Settings = {}; end
+	if KillAlert.Settings.groupWeaponKills == nil then KillAlert.Settings.groupWeaponKills = true; end
+	if KillAlert.Settings.showLocation == nil then KillAlert.Settings.showLocation = false; end
+	if KillAlert.Settings.showAbilityIcons == nil then KillAlert.Settings.showAbilityIcons = true; end
 	
 	if not KillAlert.IconList then KillAlert.IconList = {}; end
 	if not KillAlert.IconList.UnknownAbilityID then KillAlert.IconList.UnknownAbilityID = {}; end
@@ -138,6 +146,59 @@ function KillAlert.init()
 	RegisterEventHandler(SystemData.Events.WORLD_OBJ_COMBAT_EVENT, "KillAlert.OnCombatEvent")
 	KillAlert.parseUnknownsAbilities()
 	
+	if LibSlash then
+		LibSlash.RegisterSlashCmd("killalert", function(args) KillAlert.SlashCmd(args) end)
+		Print(localization.ADDON_INIT_1);
+	else
+		Print(localization.ADDON_INIT_2);
+	end
+	
+end
+
+function KillAlert.SlashCmd(args)
+
+	local command;
+	local parameter;
+	local separator = string.find(args," ");
+	
+	if separator then
+		command = string.sub(args, 0, separator-1);
+		parameter = string.sub(args, separator+1, -1);
+	else
+		command = string.sub(args, 0, separator);
+	end
+
+    if command == "groupweaponkills" then
+		if KillAlert.Settings.groupWeaponKills then
+			KillAlert.Settings.groupWeaponKills = false
+			Print("[KillAlert] groupweaponkills - "..localization.OFF)
+		else
+			KillAlert.Settings.groupWeaponKills = true
+			Print("[KillAlert] groupweaponkills - "..localization.ON)
+		end
+    elseif command == "showlocation" then
+		if KillAlert.Settings.showLocation then
+			KillAlert.Settings.showLocation = false
+			Print("[KillAlert] showlocation - "..localization.OFF)
+		else
+			KillAlert.Settings.showLocation = true
+			Print("[KillAlert] showlocation - "..localization.ON)
+		end
+    elseif command == "showabilityicons" then
+		if KillAlert.Settings.showAbilityIcons then
+			KillAlert.Settings.showAbilityIcons = false
+			Print("[KillAlert] showabilityicons - "..localization.OFF)
+		else
+			KillAlert.Settings.showAbilityIcons = true
+			Print("[KillAlert] showabilityicons - "..localization.ON)
+		end
+	else
+		Print(localization.SlashCommandsList);
+		Print(localization.SlashCommandsList1);
+		Print(localization.SlashCommandsList2);
+		Print(localization.SlashCommandsList3);
+	end
+
 end
 
 --lets do a entire ability DB check for unknown abilities, we really only want to do this once during login
@@ -268,7 +329,7 @@ function KillAlert.OnChatLogUpdated(updateType, filterType)
     local _, _, message = TextLogGetEntry("Combat", indexOfLastEntry);
 	--d(message)
 
-	local victim, verb, player, weapon, location = localization["CombatMessageParser"](message);
+	local victim, verb, player, weapon, location = KillAlert.CombatMessageParser(message);
 	-- <icon876> = party flag icon
 	--	L"<icon"..towstring(iconNum)..L">"
 	
@@ -292,7 +353,7 @@ function KillAlert.OnChatLogUpdated(updateType, filterType)
 		end
 
 		if (player ~= SelfName) then
-			if not SHOW_GROUP_WEAPON_KILLS then
+			if not KillAlert.Settings.groupWeaponKills then
 				KillAlert.AnnounceKill(killString);
 			else
 				KillAlert.AnnounceKill(killString .. towstring(CreateHyperLink(L"", tmpWeaponLeft .. weapon .. tmpWeaponRight, WEAPONUSED_COLOR, {} )) );
@@ -302,7 +363,7 @@ function KillAlert.OnChatLogUpdated(updateType, filterType)
 			local tmpIconTex = towstring("");
 			local tmpIconTexIndent = towstring("");
 			
-			if SHOW_ABILITY_ICONS then
+			if KillAlert.Settings.showAbilityIcons then
 				local iconTex = GetIconByAbilityName(weapon);
 				if iconTex then
 					--strip everything from front including leading zeros.  Add "icon" afterwards
@@ -326,19 +387,19 @@ function KillAlert.OnChatLogUpdated(updateType, filterType)
 			end
 		end
 		 
-		if SHOW_LOCATION then
+		if KillAlert.Settings.showLocation then
 			killString = killString .. L" in ";
 			killString = killString .. towstring(CreateHyperLink(L"", location, LOCATION_COLOR, {} ));
 		end
 		
 		--my own kills or possibly groups kills with weapons
-		if (player == SelfName or SHOW_GROUP_WEAPON_KILLS) then
+		if (player == SelfName or KillAlert.Settings.groupWeaponKills) then
 			killString = killString .. L" with ";
 			killString = killString .. towstring(CreateHyperLink(L"", weapon, WEAPONUSED_COLOR, {} ));	
 		end
 		
 		
-		EA_ChatWindow.Print(killString);
+		Print(killString);
 		return;
 	
 	-- someone in my group died 
@@ -362,7 +423,7 @@ function KillAlert.OnChatLogUpdated(updateType, filterType)
 		end	
 
 		if (victim ~= SelfName) then
-			if not SHOW_GROUP_WEAPON_KILLS then
+			if not KillAlert.Settings.groupWeaponKills then
 				KillAlert.AnnounceKill(killString);
 			else
 				KillAlert.AnnounceKill(killString .. towstring(CreateHyperLink(L"", tmpWeaponLeft .. weapon .. tmpWeaponRight, WEAPONUSED_COLOR, {} )) );
@@ -372,18 +433,18 @@ function KillAlert.OnChatLogUpdated(updateType, filterType)
 			KillAlert.AnnounceKill(killString .. towstring(CreateHyperLink(L"", tmpWeaponLeft .. weapon .. tmpWeaponRight, WEAPONUSED_COLOR, {} )) );
 		end
 		
-		if SHOW_LOCATION then
+		if KillAlert.Settings.showLocation then
 			killString = killString .. L" in ";
 			killString = killString .. towstring(CreateHyperLink(L"", location, LOCATION_COLOR, {} ));
 		end
 		
 		--my own deaths or possibly groups deaths with weapons
-		if (victim == SelfName or SHOW_GROUP_WEAPON_KILLS) then
+		if (victim == SelfName or KillAlert.Settings.groupWeaponKills) then
 			killString = killString .. L" with ";
 			killString = killString .. towstring(CreateHyperLink(L"", weapon, WEAPONUSED_COLOR, {} ));	
 		end
 		
-		EA_ChatWindow.Print(killString);	
+		Print(killString);	
 		return;
 	
 	end
