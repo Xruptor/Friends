@@ -40,6 +40,7 @@ KillAlert.Localization.Language[SystemData.Settings.Language.ENGLISH] =
 	SlashCommandsList1 = "/killalert groupweaponkills  -  Toggles display of group weapon/ability kill information.",
 	SlashCommandsList2 = "/killalert showlocation  -  Toggles display of kill location.",
 	SlashCommandsList3 = "/killalert showabilityicons  -  Toggles display of kill ability icons.",
+	SlashCommandsList4 = "/killalert showchatalerts  -  Toggles displaying of alerts to chat window.",
 	OFF = "OFF",
 	ON = "ON",
 	ADDON_INIT_1 = L"[KillAlert] Addon initialized. Use '/killalert'",

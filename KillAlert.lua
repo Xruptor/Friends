@@ -125,6 +125,7 @@ function KillAlert.init()
 	if KillAlert.Settings.groupWeaponKills == nil then KillAlert.Settings.groupWeaponKills = true; end
 	if KillAlert.Settings.showLocation == nil then KillAlert.Settings.showLocation = false; end
 	if KillAlert.Settings.showAbilityIcons == nil then KillAlert.Settings.showAbilityIcons = true; end
+	if KillAlert.Settings.showChatAlerts == nil then KillAlert.Settings.showChatAlerts = true; end
 	
 	if not KillAlert.IconList then KillAlert.IconList = {}; end
 	if not KillAlert.IconList.UnknownAbilityID then KillAlert.IconList.UnknownAbilityID = {}; end
@@ -192,11 +193,20 @@ function KillAlert.SlashCmd(args)
 			KillAlert.Settings.showAbilityIcons = true
 			Print("[KillAlert] showabilityicons - "..localization.ON)
 		end
+    elseif command == "showchatalerts" then
+		if KillAlert.Settings.showChatAlerts then
+			KillAlert.Settings.showChatAlerts = false
+			Print("[KillAlert] showchatalerts - "..localization.OFF)
+		else
+			KillAlert.Settings.showChatAlerts = true
+			Print("[KillAlert] showchatalerts - "..localization.ON)
+		end
 	else
 		Print(localization.SlashCommandsList);
 		Print(localization.SlashCommandsList1);
 		Print(localization.SlashCommandsList2);
 		Print(localization.SlashCommandsList3);
+		Print(localization.SlashCommandsList4);
 	end
 
 end
@@ -398,8 +408,10 @@ function KillAlert.OnChatLogUpdated(updateType, filterType)
 			killString = killString .. towstring(CreateHyperLink(L"", weapon, WEAPONUSED_COLOR, {} ));	
 		end
 		
+		if KillAlert.Settings.showChatAlerts then
+			Print(killString);
+		end
 		
-		Print(killString);
 		return;
 	
 	-- someone in my group died 
@@ -444,7 +456,10 @@ function KillAlert.OnChatLogUpdated(updateType, filterType)
 			killString = killString .. towstring(CreateHyperLink(L"", weapon, WEAPONUSED_COLOR, {} ));	
 		end
 		
-		Print(killString);	
+		if KillAlert.Settings.showChatAlerts then
+			Print(killString);
+		end
+		
 		return;
 	
 	end
